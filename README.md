@@ -35,7 +35,3 @@ Let $P$ be the plaintext letter, $C$ be the ciphertext letter, and $k$ be the se
 
 ---
 
-## 3. Python Implementation
-You can run the script using Python:
-```bash
-python caesar.py
