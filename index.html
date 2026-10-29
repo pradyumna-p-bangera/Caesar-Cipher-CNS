@@ -7,10 +7,12 @@
     <style>
         body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #f4f4f9; }
         .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        input, textarea, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        input, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; margin-right: 10px; }
         button:hover { background: #0056b3; }
-        .output { background: #e9ecef; padding: 15px; border-radius: 4px; margin-top: 15px; word-break: break-all; }
+        .decrypt-btn { background: #28a745; }
+        .decrypt-btn:hover { background: #218838; }
+        .output { background: #e9ecef; padding: 15px; border-radius: 4px; margin-top: 15px; word-break: break-all; min-height: 20px; }
     </style>
 </head>
 <body>
@@ -25,8 +27,10 @@
     <label for="shiftInput">Shift Value (Key):</label>
     <input type="number" id="shiftInput" value="3" min="1" max="25">
     
-    <button onclick="processCipher('encrypt')">Encrypt</button>
-    <button onclick="processCipher('decrypt')" style="background: #28a745;">Decrypt</button>
+    <div>
+        <button onclick="processCipher('encrypt')">Encrypt</button>
+        <button onclick="processCipher('decrypt')" class="decrypt-btn">Decrypt</button>
+    </div>
 
     <h3>Result:</h3>
     <div class="output" id="resultOutput">Your result will appear here...</div>
@@ -34,16 +38,18 @@
 
 <script>
 function caesarCipher(str, shift, action) {
+    shift = shift % 26;
     if (action === 'decrypt') {
-        shift = (26 - (shift % 26)) % 26;
+        shift = (26 - shift) % 26;
     }
+
     return str.split('').map(char => {
         let code = char.charCodeAt(0);
-        // Uppercase letters
+        // Uppercase letters (A-Z)
         if (code >= 65 && code <= 90) {
             return String.fromCharCode(((code - 65 + shift) % 26) + 65);
         }
-        // Lowercase letters
+        // Lowercase letters (a-z)
         else if (code >= 97 && code <= 122) {
             return String.fromCharCode(((code - 97 + shift) % 26) + 97);
         }
