@@ -3,69 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Caesar Cipher Demonstration - CNS Assignment</title>
+    <title>Caesar Cipher - CNS Project</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .container { background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
-        h2 { color: #2c3e50; text-align: center; }
-        label { font-weight: bold; display: block; margin-top: 15px; color: #34495e; }
-        textarea, input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
-        button { flex: 1; padding: 10px; background-color: #3498db; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
-        button:hover { background-color: #2980b9; }
-        .output-box { margin-top: 20px; background: #e8f4f8; padding: 15px; border-left: 5px solid #3498db; border-radius: 4px; word-break: break-all; }
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input, textarea, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #0056b3; }
+        .output { background: #e9ecef; padding: 15px; border-radius: 4px; margin-top: 15px; word-break: break-all; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Caesar Cipher Implementation</h2>
-    <p style="text-align: center; color: #7f8c8d;">Cryptography & Network Security Lab</p>
+<div class="card">
+    <h2>Caesar Cipher Tool</h2>
+    <p><strong>Student:</strong> Pradyumna P Bangera (1JS23CS111)</p>
+    
+    <label for="textInput">Enter Text:</label>
+    <textarea id="textInput" rows="4" placeholder="Enter message here..."></textarea>
+    
+    <label for="shiftInput">Shift Value (Key):</label>
+    <input type="number" id="shiftInput" value="3" min="1" max="25">
+    
+    <button onclick="processCipher('encrypt')">Encrypt</button>
+    <button onclick="processCipher('decrypt')" style="background: #28a745;">Decrypt</button>
 
-    <label for="inputText">Enter Text:</label>
-    <textarea id="inputText" rows="3" placeholder="Type your message here..."></textarea>
-
-    <label for="shiftKey">Shift Key (0-25):</label>
-    <input type="number" id="shiftKey" value="3" min="0" max="25">
-
-    <div class="btn-group">
-        <button onclick="processCipher('encrypt')">Encrypt</button>
-        <button onclick="processCipher('decrypt')">Decrypt</button>
-    </div>
-
-    <div class="output-box">
-        <strong>Result:</strong>
-        <p id="outputResult" style="margin: 5px 0 0 0; font-family: monospace; font-size: 16px;"></p>
-    </div>
+    <h3>Result:</h3>
+    <div class="output" id="resultOutput">Your result will appear here...</div>
 </div>
 
 <script>
-function caesar(text, shift, mode) {
-    let result = "";
-    if (mode === 'decrypt') {
+function caesarCipher(str, shift, action) {
+    if (action === 'decrypt') {
         shift = (26 - (shift % 26)) % 26;
     }
-    for (let i = 0; i < text.length; i++) {
-        let char = text[i];
-        if (char.match(/[a-z]/i)) {
-            let code = text.charCodeAt(i);
-            if (code >= 65 && code <= 90) {
-                char = String.fromCharCode(((code - 65 + shift) % 26) + 65);
-            } else if (code >= 97 && code <= 122) {
-                char = String.fromCharCode(((code - 97 + shift) % 26) + 97);
-            }
+    return str.split('').map(char => {
+        let code = char.charCodeAt(0);
+        // Uppercase letters
+        if (code >= 65 && code <= 90) {
+            return String.fromCharCode(((code - 65 + shift) % 26) + 65);
         }
-        result += char;
-    }
-    return result;
+        // Lowercase letters
+        else if (code >= 97 && code <= 122) {
+            return String.fromCharCode(((code - 97 + shift) % 26) + 97);
+        }
+        return char;
+    }).join('');
 }
 
-function processCipher(mode) {
-    const text = document.getElementById('inputText').value;
-    const shift = parseInt(document.getElementById('shiftKey').value) || 0;
-    const output = caesar(text, shift, mode);
-    document.getElementById('outputResultinnerText'] = output;
-    document.getElementById('outputResult').innerText = output;
+function processCipher(action) {
+    const text = document.getElementById('textInput').value;
+    const shift = parseInt(document.getElementById('shiftInput').value) || 0;
+    const result = caesarCipher(text, shift, action);
+    document.getElementById('resultOutput').innerText = result;
 }
 </script>
 
