@@ -1,41 +1,64 @@
-def caesar_encrypt(plaintext, shift):
-    """Encrypts plaintext using Caesar Cipher with a given shift."""
-    ciphertext = ""
-    for char in plaintext:
-        if char.isupper():
-            # Shift uppercase characters
-            ciphertext += chr((ord(char) + shift - 65) % 26 + 65)
-        elif char.islower():
-            # Shift lowercase characters
-            ciphertext += chr((ord(char) + shift - 97) % 26 + 97)
-        else:
-            # Leave spaces, numbers, and punctuation unchanged
-            ciphertext += char
-    return ciphertext
 
-def caesar_decrypt(ciphertext, shift):
-    """Decrypts ciphertext using Caesar Cipher with a given shift."""
-    plaintext = ""
-    for char in ciphertext:
-        if char.isupper():
-            plaintext += chr((ord(char) - shift - 65) % 26 + 65)
-        elif char.islower():
-            plaintext += chr((ord(char) - shift - 97) % 26 + 97)
-        else:
-            plaintext += char
-    return plaintext
+from flask import Flask, render_template, request
 
-# --- Comprehensive Test Cases ---
+app = Flask(__name__, template_folder=".")
+
+
+def caesar_cipher(text, shift, mode):
+    result = ""
+
+    if mode == "decrypt":
+        shift = -shift
+
+    for char in text:
+        if char.isalpha() and char.isascii():
+            if char.isupper():
+                base = ord('A')
+            else:
+                base = ord('a')
+
+            new_char = chr((ord(char) - base + shift) % 26 + base)
+            result += new_char
+        else:
+            result += char
+
+    return result
+
+
+@app.route("/", methods=["GET", "POST"])
+def home():
+    result = ""
+    message = ""
+    shift = 3
+    mode = "encrypt"
+    error = ""
+
+    if request.method == "POST":
+        message = request.form.get("message", "")
+        mode = request.form.get("mode", "encrypt")
+
+        try:
+            shift = int(request.form.get("shift", 3))
+
+            if not 0 <= shift <= 25:
+                error = "Shift value must be between 0 and 25."
+            elif mode not in ["encrypt", "decrypt"]:
+                error = "Please select a valid operation."
+            else:
+                result = caesar_cipher(message, shift, mode)
+
+        except ValueError:
+            error = "Please enter a valid shift number."
+
+    return render_template(
+        "index.html",
+        result=result,
+        message=message,
+        shift=shift,
+        mode=mode,
+        error=error
+    )
+
+
 if __name__ == "__main__":
-    print("=== Caesar Cipher Test Execution ===")
-    
-    test_message = "Cryptography and Network Security Assignment!"
-    shift_key = 4
-    
-    encrypted_msg = caesar_encrypt(test_message, shift_key)
-    decrypted_msg = caesar_decrypt(encrypted_msg, shift_key)
-    
-    print(f"Original Text : {test_message}")
-    print(f"Shift Key     : {shift_key}")
-    print(f"Encrypted Text: {encrypted_msg}")
-    print(f"Decrypted Text: {decrypted_msg}")
+    app.run(debug=True)

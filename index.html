@@ -1,69 +1,242 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Caesar Cipher - CNS Project</title>
+
+    <title>Caesar Cipher Implementation</title>
+
     <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #f4f4f9; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        input, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; margin-right: 10px; }
-        button:hover { background: #0056b3; }
-        .decrypt-btn { background: #28a745; }
-        .decrypt-btn:hover { background: #218838; }
-        .output { background: #e9ecef; padding: 15px; border-radius: 4px; margin-top: 15px; word-break: break-all; min-height: 20px; }
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #141e30, #243b55);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #243b55;
+            margin-top: 0;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin: 18px 0 8px;
+        }
+
+        textarea,
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 22px;
+            background: #243b55;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #141e30;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 18px;
+            background: #edf5ff;
+            border-left: 5px solid #243b55;
+            border-radius: 7px;
+            overflow-wrap: anywhere;
+        }
+
+        .result h2 {
+            color: #243b55;
+            margin-top: 0;
+            font-size: 20px;
+        }
+
+        .result-text {
+            font-size: 17px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .copy-button {
+            background: #167d58;
+            margin-top: 10px;
+        }
+
+        .copy-button:hover {
+            background: #105b40;
+        }
+
+        .error {
+            margin-top: 20px;
+            padding: 12px;
+            background: #ffe8e8;
+            color: #a00000;
+            border-radius: 7px;
+        }
+
+        .note {
+            text-align: center;
+            color: #777;
+            font-size: 12px;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 22px;
+            }
+        }
     </style>
 </head>
-<body>
 
-<div class="card">
-    <h2>Caesar Cipher Tool</h2>
-    <p><strong>Student:</strong> Pradyumna P Bangera (1JS23CS111)</p>
-    
-    <label for="textInput">Enter Text:</label>
-    <textarea id="textInput" rows="4" placeholder="Enter message here..."></textarea>
-    
-    <label for="shiftInput">Shift Value (Key):</label>
-    <input type="number" id="shiftInput" value="3" min="1" max="25">
-    
-    <div>
-        <button onclick="processCipher('encrypt')">Encrypt</button>
-        <button onclick="processCipher('decrypt')" class="decrypt-btn">Decrypt</button>
+<body>
+    <div class="container">
+
+        <h1>Caesar Cipher</h1>
+
+        <p class="subtitle">
+            Encrypt and decrypt messages using a shift cipher.
+        </p>
+
+        <form method="POST" action="/">
+
+            <label for="message">Enter your message</label>
+
+            <textarea
+                id="message"
+                name="message"
+                placeholder="Type your message here..."
+                required
+            >{{ message }}</textarea>
+
+            <label for="shift">Shift value (0-25)</label>
+
+            <input
+                type="number"
+                id="shift"
+                name="shift"
+                min="0"
+                max="25"
+                value="{{ shift }}"
+                required
+            >
+
+            <label for="mode">Choose operation</label>
+
+            <select id="mode" name="mode">
+
+                <option value="encrypt"
+                    {% if mode == "encrypt" %}selected{% endif %}>
+                    Encrypt
+                </option>
+
+                <option value="decrypt"
+                    {% if mode == "decrypt" %}selected{% endif %}>
+                    Decrypt
+                </option>
+
+            </select>
+
+            <button type="submit">Process Message</button>
+
+        </form>
+
+        {% if error %}
+            <div class="error">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        {% if result != "" %}
+            <div class="result">
+
+                <h2>Result</h2>
+
+                <p class="result-text" id="resultText">{{ result }}</p>
+
+                <button
+                    type="button"
+                    class="copy-button"
+                    onclick="copyResult()"
+                >
+                    Copy Result
+                </button>
+
+            </div>
+        {% endif %}
+
+        <p class="note">
+            Educational demonstration of the Caesar cipher algorithm.
+        </p>
+
     </div>
 
-    <h3>Result:</h3>
-    <div class="output" id="resultOutput">Your result will appear here...</div>
-</div>
+    <script>
+        function copyResult() {
+            const resultElement = document.getElementById("resultText");
 
-<script>
-function caesarCipher(str, shift, action) {
-    shift = shift % 26;
-    if (action === 'decrypt') {
-        shift = (26 - shift) % 26;
-    }
+            if (!resultElement) {
+                return;
+            }
 
-    return str.split('').map(char => {
-        let code = char.charCodeAt(0);
-        // Uppercase letters (A-Z)
-        if (code >= 65 && code <= 90) {
-            return String.fromCharCode(((code - 65 + shift) % 26) + 65);
+            const text = resultElement.innerText;
+
+            navigator.clipboard.writeText(text)
+                .then(function () {
+                    alert("Result copied successfully!");
+                })
+                .catch(function () {
+                    alert("Copy failed. Please copy the result manually.");
+                });
         }
-        // Lowercase letters (a-z)
-        else if (code >= 97 && code <= 122) {
-            return String.fromCharCode(((code - 97 + shift) % 26) + 97);
-        }
-        return char;
-    }).join('');
-}
-
-function processCipher(action) {
-    const text = document.getElementById('textInput').value;
-    const shift = parseInt(document.getElementById('shiftInput').value) || 0;
-    const result = caesarCipher(text, shift, action);
-    document.getElementById('resultOutput').innerText = result;
-}
-</script>
+    </script>
 
 </body>
 </html>
